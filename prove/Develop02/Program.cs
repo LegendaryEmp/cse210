@@ -59,6 +59,7 @@ namespace JournalApp
                 Console.WriteLine("Press Enter to continue...");
                 Console.ReadLine();
             }
+        
         }
 
     //Menu Items Display
@@ -81,7 +82,9 @@ namespace JournalApp
             Console.WriteLine(randomPrompt);
             string response = Console.ReadLine();
             journal.Add(new Entry(response, randomPrompt, DateTime.Now));
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Entry saved successfully!");
+            Console.ResetColor();
         }
 
     //Display Journal
@@ -115,8 +118,9 @@ namespace JournalApp
                     writer.WriteLine($"{entry.Date.ToString("MM/dd/yyyy")}|{entry.Prompt}|{entry.Response}");
                 }
             }
-
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Journal saved successfully!");
+            Console.ResetColor();
         }
 
     //Loading Journal file
@@ -150,7 +154,7 @@ namespace JournalApp
             }
         }
     }
-
+    
     class Entry
     {
         public string Response { get; set; }
