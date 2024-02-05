@@ -5,8 +5,7 @@ namespace RelaxationApp
 {
     class Program
     {
-        private static bool activityTimedOut = false;
-
+        
         static void Main(string[] args)
         {
             Console.Clear();
@@ -24,40 +23,45 @@ namespace RelaxationApp
 
                 int choice = int.Parse(Console.ReadLine());
 
+                Activity activity;
+
                 switch (choice)
                 {
                     case 1:
-                        BreathingActivity();
+                        activity = new BreathingActivity();
                         break;
                     case 2:
-                        ReflectionActivity();
+                        activity = new ReflectionActivity();
                         break;
                     case 3:
-                        ListingActivity();
+                        activity = new ListingActivity();
                         break;
                     case 4:
                         Console.WriteLine("Thank you for using the app! Have a relaxing day.");
                         return;
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
-                        break;
+                        continue;
                 }
+
+                activity.Start();
+                activity.PerformActivity();
+                activity.End();
             }
         }
+    }
 
-        static void StartActivity(string activityName, string description, out int duration)
-        {
-            Console.Clear();
-            Console.WriteLine($"Starting {activityName} Activity");
-            Console.WriteLine(description);
-            Console.Write("Enter the duration in seconds: ");
-            duration = int.Parse(Console.ReadLine());
+    abstract class Activity
+    {
+        protected string ActivityName;
+        protected string Description;
+        protected int Duration;
 
-            Console.WriteLine("Prepare to begin...");
-            ShowAnimation(3);
-        }
+        public abstract void Start();
+        public abstract void PerformActivity();
+        public abstract void End();
 
-        static void ShowAnimation(int seconds)
+        protected void ShowAnimation(int seconds)
         {
             for (int i = 0; i < seconds; i++)
             {
@@ -67,73 +71,7 @@ namespace RelaxationApp
             Console.WriteLine();
         }
 
-        static void EndActivity()
-        {
-            Console.WriteLine("You did a great job! ");
-            ShowAnimation(2);
-            Console.WriteLine("You have completed the activity.");
-            ShowAnimation(2);
-            Console.WriteLine("Press enter key to continue!");
-            Console.ReadLine();
-        }
-
-        // Breathing Activity 
-        static void BreathingActivity()
-        {
-            StartActivity("Breathing", "This activity will help you relax by guiding you through breathing in and out slowly. Clear your mind and focus on your breathing.", out int duration);
-
-            for (int i = 0; i < duration; i += 4)
-            {
-                Console.WriteLine("Breathe in...");
-                ShowCountdown(3);
-                Console.WriteLine("Breathe out...");
-                ShowCountdown(3);
-            }
-
-            EndActivity();
-        }
-
-        // Reflection Activity 
-        static void ReflectionActivity()
-        {
-            StartActivity("Reflection", "This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power you have and how you can use it in other aspects of your life.", out int duration);
-
-            string[] prompts = {
-                "Think of a time when you stood up for someone else.",
-                "Think of a time when you did something really difficult.",
-                "Think of a time when you helped someone in need.",
-                "Think of a time when you did something truly selfless."
-            };
-            string[] questions = {
-                "Why was this experience meaningful to you?",
-                "Have you ever done anything like this before?",
-                "How did you get started?",
-                "How did you feel when it was complete?",
-                "What made this time different than other times when you were not as successful?",
-                "What is your favorite thing about this experience?",
-                "What could you learn from this experience that applies to other situations?",
-                "What did you learn about yourself through this experience?",
-                "How can you keep this experience in mind in the future?"
-            };
-
-            Random random = new Random();
-            Console.WriteLine(prompts[random.Next(prompts.Length)]);
-            ShowCountdown(5);
-
-            int elapsedTime = 0;
-            while (elapsedTime < duration && !activityTimedOut)
-            {
-                Console.WriteLine(questions[random.Next(questions.Length)]);
-                ShowCountdown(4);
-                elapsedTime += 4;
-            }
-
-            EndActivity();
-            Console.WriteLine("Press enter key to continue!");
-            Console.ReadLine();
-        }
-
-        static void ShowCountdown(int seconds)
+        protected void ShowCountdown(int seconds)
         {
             for (int i = seconds; i > 0; i--)
             {
@@ -142,49 +80,173 @@ namespace RelaxationApp
             }
             Console.WriteLine();
         }
+    }
 
-      // Listing Activity
-        static void ListingActivity()
+    class BreathingActivity : Activity
+    {
+        public BreathingActivity()
         {
-            StartActivity("Listing", "This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.", out int duration);
+            ActivityName = "Breathing";
+            Description = "This activity will help you relax by guiding you through breathing in and out slowly. Clear your mind and focus on your breathing.";
+        }
 
-            string[] prompts = {
-                "Who are people that you appreciate?",
-                "What are personal strengths of yours?",
-                "Who are people that you have helped this week?",
-                "When have you felt the Holy Ghost this month?",
-                "Who are some of your personal heroes?"
-            };
+        public override void Start()
+        {
+            Console.Clear();
+            Console.WriteLine($"Starting {ActivityName} Activity");
+            Console.WriteLine(Description);
+            Console.Write("Enter the duration in seconds: ");
+            Duration = int.Parse(Console.ReadLine());
 
-            Random random = new Random();
-            Console.WriteLine(prompts[random.Next(prompts.Length)]);
+            Console.WriteLine("Prepare to begin...");
+            ShowAnimation(3);
+        }
+
+        public override void PerformActivity()
+        {
+            for (int i = 0; i < Duration; i += 4)
+            {
+                Console.WriteLine("Breathe in...");
+                ShowCountdown(3);
+                Console.WriteLine("Breathe out...");
+                ShowCountdown(3);
+            }
+        }
+
+        public override void End()
+        {
+            Console.WriteLine("You did a great job! ");
+            ShowAnimation(2);
+            Console.WriteLine("You have completed the activity.");
+            ShowAnimation(2);
+            Console.WriteLine("Press enter key to continue!");
+            Console.ReadLine();
+        }
+    }
+
+    class ReflectionActivity : Activity
+    {
+        private string[] prompts = {
+            "Think of a time when you stood up for someone else.",
+            "Think of a time when you did something really difficult.",
+            "Think of a time when you helped someone in need.",
+            "Think of a time when you did something truly selfless."
+        };
+
+        private string[] questions = {
+            "Why was this experience meaningful to you?",
+            "Have you ever done anything like this before?",
+            // Add more questions as needed
+        };
+
+        public ReflectionActivity()
+        {
+            ActivityName = "Reflection";
+            Description = "This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power you have and how you can use it in other aspects of your life.";
+        }
+
+        public override void Start()
+        {
+            Console.Clear();
+            Console.WriteLine($"Starting {ActivityName} Activity");
+            Console.WriteLine(Description);
+            Console.Write("Enter the duration in seconds: ");
+            Duration = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Prepare to begin...");
+            ShowAnimation(3);
+        }
+
+        public override void PerformActivity()
+        {
+            Console.WriteLine(prompts[new Random().Next(prompts.Length)]);
+            ShowCountdown(5);
+
+            int elapsedTime = 0;
+            while (elapsedTime < Duration)
+            {
+                Console.WriteLine(questions[new Random().Next(questions.Length)]);
+                ShowCountdown(5);
+                elapsedTime += 5;
+            }
+        }
+
+        public override void End()
+        {
+            Console.WriteLine("You did a great job! ");
+            ShowAnimation(2);
+            Console.WriteLine("You have completed the activity.");
+            ShowAnimation(2);
+            Console.WriteLine("Press enter key to continue!");
+            Console.ReadLine();
+        }
+    }
+
+    class ListingActivity : Activity
+    {
+        private string[] prompts = {
+            "Who are people that you appreciate?",
+            "What are personal strengths of yours?",
+            "Who are people that you have helped this week?",
+            "When have you felt the Holy Ghost this month?",
+            "Who are some of your personal heroes?"
+        };
+
+        private static bool activityTimedOut = false;
+        public ListingActivity()
+        {
+            ActivityName = "Listing";
+            Description = "This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.";
+        }
+
+        public override void Start()
+        {
+            Console.Clear();
+            Console.WriteLine($"Starting {ActivityName} Activity");
+            Console.WriteLine(Description);
+            Console.Write("Enter the duration in seconds: ");
+            Duration = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Prepare to begin...");
+            ShowAnimation(3);
+        }
+
+        public override void PerformActivity()
+        {
+            Console.WriteLine(prompts[new Random().Next(prompts.Length)]);
             ShowCountdown(5);
 
             int elapsedTime = 0;
             int itemCount = 0;
 
-    
             Thread timeoutThread = new Thread(() =>
             {
-                Thread.Sleep(duration * 1000);
+                Thread.Sleep(Duration * 1000);
+                Console.WriteLine("Activity timed out!");
                 activityTimedOut = true;
             });
 
             timeoutThread.Start();
 
-            while (elapsedTime < duration && !activityTimedOut)
+            while (elapsedTime < Duration && !activityTimedOut)
             {
                 Console.Write("Enter an item: ");
                 string item = Console.ReadLine();
                 itemCount++;
-                elapsedTime += 2; 
+                elapsedTime += 2;
             }
 
-            
             timeoutThread.Join();
 
             Console.WriteLine($"You listed {itemCount} items.");
-            EndActivity();
+        }
+
+        public override void End()
+        {
+            Console.WriteLine("You did a great job! ");
+            ShowAnimation(2);
+            Console.WriteLine("You have completed the activity.");
+            ShowAnimation(2);
             Console.WriteLine("Press enter key to continue!");
             Console.ReadLine();
         }
